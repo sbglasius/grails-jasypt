@@ -12,7 +12,6 @@ buildscript {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails.plugins:hibernate5:${gormVersion}"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:4.4.0"
-        classpath "io.github.gradle-nexus:publish-plugin:1.3.0"
     }
 }
 
@@ -48,9 +47,7 @@ idea.project.ipr {
 
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-gsp"
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-apply plugin: "io.github.gradle-nexus.publish-plugin"
+apply plugin: "org.grails.grails-publish"
 
 ext {
     grailsVersion = project.grailsVersion
@@ -64,6 +61,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
+    maven { url "https://repo.grails.org/grails/restricted" }
 }
 
 dependencyManagement {
@@ -91,79 +89,14 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
 }
 
-// Create javadoc JAR task (sourcesJar is provided by Grails plugin)
-task javadocJar(type: Jar) {
-    archiveClassifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-//https://grails.org/blog/2021-04-07-publish-grails-plugin-to-maven-central.html
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = project.group
-            artifactId = 'jasypt-encryption'
-            version = project.version
-
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-
-            pom {
-                name = 'Grails Jasypt Plugin'
-                description = 'The Grails Jasypt Encryption plugin provides strong field-level encryption support on Grails GORM String fields.'
-                url = 'https://github.com/ZenHarbinger/grails-jasypt/'
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'ZenHarbinger'
-                        name = 'Matt Aguirre'
-                        email = 'matt@tros.org'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/ZenHarbinger/grails-jasypt.git'
-                    developerConnection = 'scm:git:ssh://github.com:ZenHarbinger/grails-jasypt.git'
-                    url = 'https://github.com/ZenHarbinger/grails-jasypt/'
-                }
-            }
-        }
+grailsPublish {
+    githubSlug = 'sbglasius/grails-jasypt'
+    license {
+        name = 'Apache-2.0'
     }
-}
-
-ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
-
-afterEvaluate {
-    signing {
-        required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
-        sign publishing.publications.maven
-    }
-}
-
-tasks.withType(Sign) {
-    onlyIf { isReleaseVersion }
-}
-
-ext."signing.keyId" = project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : System.getenv('SIGNING_KEY_ID')
-ext."signing.password" = project.hasProperty("signing.password") ? project.getProperty('signing.password') : System.getenv('SIGNING_PASSPHRASE')
-ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : (System.getenv('SECRING_FILE')?:"${System.properties['user.home']}${File.separator}.gnupg${File.separator}secring.gpg")
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            def ossUser = System.getenv("SONATYPE_USERNAME") ?: project.hasProperty("sonatypeOssUsername") ? project.sonatypeOssUsername : ''
-            def ossPass = System.getenv("SONATYPE_PASSWORD") ?: project.hasProperty("sonatypeOssPassword") ? project.sonatypeOssPassword : ''
-            def ossStagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID") ?: project.hasProperty("sonatypeOssStagingProfileId") ? project.sonatypeOssStagingProfileId : ''
-            nexusUrl = uri("https://oss.sonatype.org/service/local/")
-            snapshotRepositoryUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-            username = ossUser
-            password = ossPass
-            stagingProfileId = ossStagingProfileId
-        }
-    }
+    title = 'Grails Jasypt Plugin'
+    desc = 'The Grails Jasypt Encryption plugin provides strong field-level encryption support on Grails GORM String fields.'
+    developers = [
+        ZenHarbinger: 'Matt Aguirre'
+    ]
 }
