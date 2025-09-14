@@ -55,7 +55,7 @@ dependencyManagement {
 }
 
 dependencies {
-    implementation "org.grails.plugins:jasypt-encryption:4.0.3"
+    implementation "org.grails.plugins:jasypt-encryption:4.0.4"
     testImplementation "org.grails:grails-gorm-testing-support"
 
     implementation "org.springframework.boot:spring-boot-starter-logging"
