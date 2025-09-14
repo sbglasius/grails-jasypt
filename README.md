@@ -6,10 +6,17 @@ It also comes with the [Bouncy Castle](http://www.bouncycastle.org/java.html) en
 
 ```
 dependencies {
-    compile "org.tros:jasypt-encryption:4.0.4"
+    implementation "org.tros:jasypt-encryption:4.0.4"
 }
 ```
-If your app is using **Grails 4** or higher, then use version **4.0.4** of this plugin.  
+If your app is using **Grails 7** or higher, then use version **4.0.4** of this plugin.
+
+**Requirements for Grails 7:**
+- Java 17 or higher
+- Gradle 8.5 or higher  
+
+#### Previous versions  
+If your app is using **Grails 4**, then use version **4.0.3** of this plugin.  
 
 #### No longer supported
 If your app is using **Grails 3** or higher, then use version **2.0.2** of this plugin.  
